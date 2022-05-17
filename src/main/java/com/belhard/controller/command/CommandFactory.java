@@ -11,6 +11,8 @@ import com.belhard.controller.command.impl.UsersCommand;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.belhard.controller.Controller.context;
+
 public class CommandFactory {
 
     private static class Holder {
@@ -27,12 +29,12 @@ public class CommandFactory {
     private static final Map<String, Command> map = new HashMap<>();
 
     static {
-        map.put("book", new BookCommand());
-        map.put("books", new BooksCommand());
+        map.put("book", context.getBean(BookCommand.class));
+        map.put("books", context.getBean(BooksCommand.class));
         map.put("create-book-form", new AddBookFormCommand());
-        map.put("create-book", new CreateBookCommand());
-        map.put("user", new UserCommand());
-        map.put("users", new UsersCommand());
+        map.put("create-book", context.getBean(CreateBookCommand.class));
+        map.put("user", context.getBean(UserCommand.class));
+        map.put("users", context.getBean(UsersCommand.class));
         map.put("error", new ErrorCommand());
     }
 

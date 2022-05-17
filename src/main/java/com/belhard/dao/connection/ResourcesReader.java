@@ -57,10 +57,10 @@ public class ResourcesReader {
     }
 
     private boolean isDbRemote() {
-        if (System.getenv("db.remote") != null) {
-            return System.getenv("db.remote").equals("true");
+        if (properties.getProperty("db.remote") != null) {
+            return properties.getProperty("db.remote").equals("true");
         } else {
-            throw new RuntimeException("Parameter not set in VM options.");
+            throw new RuntimeException("Property not exists in file.");
         }
     }
 }
