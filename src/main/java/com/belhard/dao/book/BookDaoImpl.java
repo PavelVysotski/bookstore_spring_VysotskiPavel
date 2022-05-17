@@ -4,6 +4,7 @@ import com.belhard.dao.connection.DbConnection;
 import com.belhard.dao.entity.Book;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
+@Component
 public class BookDaoImpl implements BookDao {
 
     private static final Logger logger = LogManager.getLogger(BookDaoImpl.class);

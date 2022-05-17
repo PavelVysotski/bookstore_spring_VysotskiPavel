@@ -1,42 +1,50 @@
 package com.belhard.service.impl;
 
 import com.belhard.dao.entity.User;
-import com.belhard.dao.user.UserDaoImpl;
+import com.belhard.dao.user.UserDao;
 import com.belhard.service.UserService;
 import com.belhard.service.dto.user.UserDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class UserServiceImpl implements UserService {
 
-    private static final UserDaoImpl USER_DAO = new UserDaoImpl();
+    private final UserDao userDao;
+
+    @Autowired
+    public UserServiceImpl(UserDao userDao) {
+        this.userDao = userDao;
+    }
 
     @Override
     public List<UserDto> getAllUsers() {
-        return USER_DAO.getAllUsers().stream()
+        return userDao.getAllUsers().stream()
                 .map(this::userToUserDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public UserDto getUserById(Long id) {
-        return userToUserDto(USER_DAO.getUserById(id));
+        return userToUserDto(userDao.getUserById(id));
     }
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        return userToUserDto(USER_DAO.createUser(userDtoToUser(userDto)));
+        return userToUserDto(userDao.createUser(userDtoToUser(userDto)));
     }
 
     @Override
     public UserDto updateUserById(UserDto userDto) {
-        return userToUserDto(USER_DAO.updateUser(userDtoToUser(userDto)));
+        return userToUserDto(userDao.updateUser(userDtoToUser(userDto)));
     }
 
     @Override
     public void deleteUserById(Long id) {
-        if (!USER_DAO.deleteUserById(id)) {
+        if (!userDao.deleteUserById(id)) {
             throw new RuntimeException("This user has been inactive or does not exist in the list.");
         }
     }
