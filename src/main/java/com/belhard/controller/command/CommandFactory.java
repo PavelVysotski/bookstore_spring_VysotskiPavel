@@ -1,5 +1,6 @@
 package com.belhard.controller.command;
 
+import com.belhard.controller.Controller;
 import com.belhard.controller.command.impl.AddBookFormCommand;
 import com.belhard.controller.command.impl.BookCommand;
 import com.belhard.controller.command.impl.BooksCommand;
@@ -27,12 +28,12 @@ public class CommandFactory {
     private static final Map<String, Command> map = new HashMap<>();
 
     static {
-        map.put("book", new BookCommand());
-        map.put("books", new BooksCommand());
+        map.put("book", Controller.context.getBean(BookCommand.class));
+        map.put("books", Controller.context.getBean(BooksCommand.class));
         map.put("create-book-form", new AddBookFormCommand());
-        map.put("create-book", new CreateBookCommand());
-        map.put("user", new UserCommand());
-        map.put("users", new UsersCommand());
+        map.put("create-book", Controller.context.getBean(CreateBookCommand.class));
+        map.put("user", Controller.context.getBean(UserCommand.class));
+        map.put("users", Controller.context.getBean(UsersCommand.class));
         map.put("error", new ErrorCommand());
     }
 

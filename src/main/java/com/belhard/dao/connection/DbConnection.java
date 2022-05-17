@@ -19,7 +19,7 @@ public class DbConnection {
     private static final String PASSWORD = resources.getPassword();
 
     static {
-        logger.info("Getting connection to DB with url={}, login={}, password={}", DB_URL, LOGIN, PASSWORD);
+        logger.info("Getting connection to DB with credentials from file.", DB_URL, LOGIN, PASSWORD);
         try {
             Class.forName("org.postgresql.Driver");
             connection = DriverManager.getConnection(DB_URL, LOGIN, PASSWORD);
