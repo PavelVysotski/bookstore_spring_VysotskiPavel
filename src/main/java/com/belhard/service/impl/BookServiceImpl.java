@@ -1,54 +1,62 @@
 package com.belhard.service.impl;
 
-import com.belhard.dao.book.BookDaoImpl;
+import com.belhard.dao.book.BookDao;
 import com.belhard.dao.entity.Book;
 import com.belhard.service.BookService;
 import com.belhard.service.dto.book.BookDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class BookServiceImpl implements BookService {
 
-    public static final BookDaoImpl BOOK_DAO = new BookDaoImpl();
+    public final BookDao bookDao;
+
+    @Autowired
+    public BookServiceImpl(BookDao bookDao) {
+        this.bookDao = bookDao;
+    }
 
     @Override
     public BookDto createBook(BookDto bookDto) {
-        return bookToBookDto(BOOK_DAO.createBook(bookDtoToBook(bookDto)));
+        return bookToBookDto(bookDao.createBook(bookDtoToBook(bookDto)));
     }
 
     @Override
     public BookDto updateBook(BookDto bookDto) {
-        return bookToBookDto(BOOK_DAO.updateBook(bookDtoToBook(bookDto)));
+        return bookToBookDto(bookDao.updateBook(bookDtoToBook(bookDto)));
     }
 
     @Override
     public List<BookDto> getAllBooks() {
-        return BOOK_DAO.getAllBooks().stream()
+        return bookDao.getAllBooks().stream()
                 .map(this::bookToBookDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public BookDto getBookById(Long id) {
-        return bookToBookDto(BOOK_DAO.getBookById(id));
+        return bookToBookDto(bookDao.getBookById(id));
     }
 
     @Override
     public BookDto getBookByIsbn(String isbn) {
-        return bookToBookDto(BOOK_DAO.getBookByIsbn(isbn));
+        return bookToBookDto(bookDao.getBookByIsbn(isbn));
     }
 
     @Override
     public List<BookDto> getBooksByAuthor(String author) {
-        return BOOK_DAO.getBooksByAuthor(author).stream()
+        return bookDao.getBooksByAuthor(author).stream()
                 .map(this::bookToBookDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void deleteBookById(Long id) {
-        if (BOOK_DAO.deleteBookById(id)) {
+        if (bookDao.deleteBookById(id)) {
             System.out.println("The book has been successfully removed from sale.");
         } else {
             System.out.println("This book has been removed or does not exist in the list.");
@@ -57,7 +65,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void countAllBooks() {
-        System.out.println("The number of books on sale is = " + BOOK_DAO.countAllBooks());
+        System.out.println("The number of books on sale is = " + bookDao.countAllBooks());
     }
 
     private BookDto bookToBookDto(Book book) {
