@@ -1,188 +1,131 @@
 package com.belhard.dao.book;
 
-import com.belhard.dao.connection.DbConnection;
 import com.belhard.dao.entity.Book;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-
-@Component
+@Repository
 public class BookDaoImpl implements BookDao {
 
     private static final Logger logger = LogManager.getLogger(BookDaoImpl.class);
 
     private static final String SELECT_ALL = "SELECT id, isbn, title, author, cover, price FROM books WHERE deleted = false ORDER BY id ASC";
-    private static final String SELECT_BY_ID = "SELECT id, isbn, title, author, cover, price FROM books WHERE id = ? AND deleted = false";
-    private static final String SELECT_BY_AUTHOR = "SELECT id, isbn, title, author, cover, price FROM books WHERE author = ? AND deleted = false";
-    private static final String SELECT_BY_ISBN = "SELECT id, isbn, title, author, cover, price FROM books WHERE isbn = ? AND deleted = false";
-    private static final String ADD = "INSERT INTO books (isbn, title, author, cover, price) VALUES (?, ?, ?, CAST(? AS type_cover), ?)";
-    private static final String UPDATE = "UPDATE books SET isbn = ?, title = ?, author = ?, cover = CAST(? AS type_cover), price = ? WHERE id = ?";
-    private static final String DELETE_BY_ID = "UPDATE books SET deleted = true WHERE id = ? AND deleted = false";
+    private static final String SELECT_BY_ID = "SELECT id, isbn, title, author, cover, price FROM books WHERE id = :id AND deleted = false";
+    private static final String SELECT_BY_AUTHOR = "SELECT id, isbn, title, author, cover, price FROM books WHERE author = :author AND deleted = false";
+    private static final String SELECT_BY_ISBN = "SELECT id, isbn, title, author, cover, price FROM books WHERE isbn = :isbn AND deleted = false";
+    private static final String ADD = "INSERT INTO books (isbn, title, author, cover, price) VALUES (:isbn, :title, :author, CAST(:cover AS type_cover), :price)";
+    private static final String UPDATE = "UPDATE books SET isbn = :isbn, title = :title, author = :author, cover = CAST(:cover AS type_cover), price = :price WHERE id = :id";
+    private static final String DELETE_BY_ID = "UPDATE books SET deleted = true WHERE id = :id AND deleted = false";
     private static final String COUNT_ALL_BOOKS = "SELECT COUNT(*) as count FROM books WHERE deleted = false";
 
-    private static final Connection CONNECTION = DbConnection.getConnection();
+    private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final BookRowMapper bookRowMapper;
+
+    @Autowired
+    public BookDaoImpl(NamedParameterJdbcTemplate jdbcTemplate, BookRowMapper bookRowMapper) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.bookRowMapper = bookRowMapper;
+    }
 
     @Override
     public List<Book> getAllBooks() {
         logger.debug("Getting all books from DB.");
-        List<Book> result = new ArrayList<>();
-        try {
-            PreparedStatement statement = CONNECTION.prepareStatement(SELECT_ALL);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                Book books = bookToObj(resultSet);
-                result.add(books);
-            }
-        } catch (SQLException e) {
-            logger.error("Check the SQL request.", e);
-        }
-        return result;
+        return jdbcTemplate.query(SELECT_ALL, bookRowMapper);
     }
 
     @Override
     public Book getBookById(Long id) {
         logger.debug("Getting a book from the database by ID={}", id);
-        Book book = null;
-        try {
-            PreparedStatement statement = CONNECTION.prepareStatement(SELECT_BY_ID);
-            statement.setLong(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            book = bookToObj(resultSet);
-        } catch (SQLException e) {
-            logger.error("Check the SQL request.", e);
-        }
-        return book;
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        return jdbcTemplate.queryForObject(SELECT_BY_ID, params, bookRowMapper);
     }
 
     @Override
     public Book getBookByIsbn(String isbn) {
         logger.debug("Getting book from the database by ISBN={}", isbn);
-        Book book = null;
-        try {
-            PreparedStatement statement = CONNECTION.prepareStatement(SELECT_BY_ISBN);
-            statement.setString(1, isbn);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            book = bookToObj(resultSet);
-        } catch (SQLException e) {
-            logger.error("Check the SQL request.", e);
-        }
-        return book;
+        Map<String, Object> params = new HashMap<>();
+        params.put("isbn", isbn);
+        return jdbcTemplate.queryForObject(SELECT_BY_ISBN, params, bookRowMapper);
     }
 
     @Override
     public List<Book> getBooksByAuthor(String author) {
         logger.debug("Getting book from the database by AUTHOR={}", author);
-        List<Book> result = new ArrayList<>();
-        try {
-            PreparedStatement statement = CONNECTION.prepareStatement(SELECT_BY_AUTHOR);
-            statement.setString(1, author);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                Book books = bookToObj(resultSet);
-                result.add(books);
-            }
-        } catch (SQLException e) {
-            logger.error("Check the SQL request.", e);
-        }
-        return result;
+        Map<String, Object> params = new HashMap<>();
+        params.put("author", author);
+        return jdbcTemplate.query(SELECT_BY_AUTHOR, params, bookRowMapper);
     }
 
     @Override
     public Book createBook(Book book) {
         logger.debug("Creating new book and adding to database.");
-        try {
-            PreparedStatement statement = CONNECTION.prepareStatement(ADD, RETURN_GENERATED_KEYS);
-            statement.setString(1, book.getIsbn());
-            statement.setString(2, book.getTitle());
-            statement.setString(3, book.getAuthor());
-            statement.setString(4, book.getTypeCover().toString());
-            statement.setBigDecimal(5, book.getPrice());
-            statement.executeUpdate();
-
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                return bookToObj(generatedKeys);
-            } else {
-                throw new RuntimeException("Failed to create book.");
-            }
-        } catch (SQLException e) {
-            logger.error("Check the SQL request.", e);
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        Map<String, Object> params = new HashMap<>();
+        params.put("isbn", book.getIsbn());
+        params.put("title", book.getTitle());
+        params.put("author", book.getAuthor());
+        params.put("cover", book.getTypeCover().toString());
+        params.put("price", book.getPrice());
+        SqlParameterSource source = new MapSqlParameterSource(params);
+        int rowsUpdate = jdbcTemplate.update(ADD, source, keyHolder, new String[]{"id"});
+        if (rowsUpdate != 1) {
+            throw new RuntimeException("Can't create the book" + book);
         }
-        throw new RuntimeException("Book not created.");
+        Long id = Optional.ofNullable(keyHolder.getKey())
+                .map(Number::longValue)
+                .orElseThrow(() -> new RuntimeException("Can't create the book" + book));
+        return getBookById(id);
     }
 
     @Override
     public Book updateBook(Book book) {
         logger.debug("Updating existing book in the database.");
-        try {
-            PreparedStatement statement = CONNECTION.prepareStatement(UPDATE, RETURN_GENERATED_KEYS);
-            statement.setString(1, book.getIsbn());
-            statement.setString(2, book.getTitle());
-            statement.setString(3, book.getAuthor());
-            statement.setString(4, book.getTypeCover().toString());
-            statement.setBigDecimal(5, book.getPrice());
-            statement.setLong(6, book.getId());
-            statement.executeUpdate();
-
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                return bookToObj(generatedKeys);
-            } else {
-                throw new RuntimeException("Failed to update book.");
-            }
-        } catch (SQLException e) {
-            logger.error("Check the SQL request.", e);
+        Map<String, Object> params = new HashMap<>();
+        params.put("isbn", book.getIsbn());
+        params.put("title", book.getTitle());
+        params.put("author", book.getAuthor());
+        params.put("cover", book.getTypeCover().toString());
+        params.put("price", book.getPrice());
+        params.put("id", book.getId());
+        SqlParameterSource source = new MapSqlParameterSource(params);
+        int rowsUpdate = jdbcTemplate.update(UPDATE, source);
+        if (rowsUpdate != 1) {
+            throw new RuntimeException("Can't update a book" + book);
         }
-        throw new RuntimeException("Book not updated.");
+        return getBookById(book.getId());
     }
 
     @Override
     public boolean deleteBookById(Long id) {
         logger.debug("Deleting existing book by ID={}.", id);
-        try {
-            PreparedStatement statement = CONNECTION.prepareStatement(DELETE_BY_ID);
-            statement.setLong(1, id);
-            return statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            logger.error("Check the SQL request.", e);
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        int rowsUpdate = jdbcTemplate.update(DELETE_BY_ID, params);
+        if (rowsUpdate != 1) {
+            throw new RuntimeException("Can't delete the book with id = " + id);
         }
-        return false;
+        return rowsUpdate == 1;
     }
 
     @Override
     public int countAllBooks() {
         logger.debug("Getting the total number of books.");
-        try {
-            PreparedStatement statement = CONNECTION.prepareStatement(COUNT_ALL_BOOKS);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            return resultSet.getInt(1);
-        } catch (SQLException e) {
-            logger.error("Check the SQL request.", e);
-        }
-        return 0;
-    }
-
-    private Book bookToObj(ResultSet resultSet) throws SQLException {
-        Book book = new Book();
-        book.setId(resultSet.getLong("id"));
-        book.setIsbn(resultSet.getString("isbn"));
-        book.setTitle(resultSet.getString("title"));
-        book.setAuthor(resultSet.getString("author"));
-        book.setTypeCover(Book.TypeCover.valueOf(resultSet.getString("cover")));
-        book.setPrice(resultSet.getBigDecimal("price"));
-
-        return book;
+        return jdbcTemplate.query(COUNT_ALL_BOOKS, (rs) -> {
+            rs.next();
+            return rs.getInt("count");
+        });
     }
 }

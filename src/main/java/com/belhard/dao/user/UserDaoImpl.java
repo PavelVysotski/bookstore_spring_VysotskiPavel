@@ -1,19 +1,20 @@
 package com.belhard.dao.user;
 
-import com.belhard.dao.connection.DbConnection;
 import com.belhard.dao.entity.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
+import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class UserDaoImpl implements UserDao {
@@ -23,119 +24,84 @@ public class UserDaoImpl implements UserDao {
     private static final String SELECT_ALL = "SELECT u.id, u.name, u.second_name, u.email, u.password, r.role " +
             "AS role FROM users u JOIN roles r ON u.role_id = r.id WHERE activity = true ORDER BY id ASC";
     private static final String SELECT_BY_ID = "SELECT u.id, u.name, u.second_name, u.email, u.password, r.role " +
-            "AS role FROM users u JOIN roles r ON u.role_id = r.id WHERE u.id = ? AND activity = true ORDER BY id ASC";
+            "AS role FROM users u JOIN roles r ON u.role_id = r.id WHERE u.id = :id AND activity = true ORDER BY id ASC";
     private static final String ADD = "INSERT INTO users (name, second_name, email, password, role_id) " +
-            "VALUES (?, ?, ?, ?, (SELECT id FROM roles WHERE role = ?))";
-    private static final String UPDATE = "UPDATE users SET name = ?, second_name = ?, email = ?, password = ?, role_id = " +
-            "(SELECT id FROM roles WHERE role = ?) WHERE id = ?";
-    private static final String DELETE_BY_ID = "UPDATE users SET activity = false WHERE id = ? AND activity = true";
+            "VALUES (:name, :secondName, :email, :password, (SELECT id FROM roles WHERE role = :role))";
+    private static final String UPDATE = "UPDATE users SET name = :name, second_name = :secondName, email = :email, password = :password, role_id = " +
+            "(SELECT id FROM roles WHERE role = :role) WHERE id = :id";
+    private static final String DELETE_BY_ID = "UPDATE users SET activity = false WHERE id = :id AND activity = true";
 
-    private static final Connection CONNECTION = DbConnection.getConnection();
+    private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final UserRowMapper userRowMapper;
+
+    @Autowired
+    public UserDaoImpl(NamedParameterJdbcTemplate jdbcTemplate, UserRowMapper userRowMapper) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.userRowMapper = userRowMapper;
+    }
 
     @Override
     public List<User> getAllUsers() {
         logger.debug("Getting all users from database.");
-        List<User> result = new ArrayList<>();
-        try {
-            PreparedStatement statement = CONNECTION.prepareStatement(SELECT_ALL);
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                User users = userToObj(resultSet);
-                result.add(users);
-            }
-        } catch (SQLException e) {
-            logger.error("Check the SQL request.", e);
-        }
-        return result;
+        return jdbcTemplate.query(SELECT_ALL, userRowMapper);
     }
 
     @Override
     public User getUserById(Long id) {
         logger.debug("Getting user from database by ID={}.", id);
-        User user = null;
-        try {
-            PreparedStatement statement = CONNECTION.prepareStatement(SELECT_BY_ID);
-            statement.setLong(1, id);
-            ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
-            user = userToObj(resultSet);
-        } catch (SQLException e) {
-            logger.error("Check the SQL request.", e);
-        }
-        return user;
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        return jdbcTemplate.queryForObject(SELECT_BY_ID, params, userRowMapper);
     }
 
     @Override
     public User createUser(User newUser) {
         logger.debug("Creating new user and adding to database.");
-        try {
-            PreparedStatement statement = CONNECTION.prepareStatement(ADD, RETURN_GENERATED_KEYS);
-            statement.setString(1, newUser.getName());
-            statement.setString(2, newUser.getSecondName());
-            statement.setString(3, newUser.getEmail());
-            statement.setString(4, newUser.getPassword());
-            statement.setString(5, newUser.getRole().toString());
-            statement.executeUpdate();
-
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                return getUserById(generatedKeys.getLong("id"));
-            } else {
-                throw new RuntimeException("Failed to create user.");
-            }
-        } catch (SQLException e) {
-            logger.error("Check the SQL request.", e);
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", newUser.getName());
+        params.put("secondName", newUser.getSecondName());
+        params.put("email", newUser.getEmail());
+        params.put("password", newUser.getPassword());
+        params.put("role", newUser.getRole().toString());
+        SqlParameterSource source = new MapSqlParameterSource(params);
+        int rowsUpdate = jdbcTemplate.update(ADD, source, keyHolder, new String[]{"id"});
+        if (rowsUpdate != 1) {
+            throw new RuntimeException("Can't create the user" + newUser);
         }
-        throw new RuntimeException("User not created.");
+        Long id = Optional.ofNullable(keyHolder.getKey())
+                .map(Number::longValue)
+                .orElseThrow(() -> new RuntimeException("Can't create the user" + newUser));
+        return getUserById(id);
     }
 
     @Override
     public User updateUser(User updateUser) {
         logger.debug("Updating existing user.");
-        try {
-            PreparedStatement statement = CONNECTION.prepareStatement(UPDATE, RETURN_GENERATED_KEYS);
-            statement.setString(1, updateUser.getName());
-            statement.setString(2, updateUser.getSecondName());
-            statement.setString(3, updateUser.getEmail());
-            statement.setString(4, updateUser.getPassword());
-            statement.setString(5, updateUser.getRole().toString());
-            statement.setLong(6, updateUser.getId());
-            statement.executeUpdate();
-
-            ResultSet generatedKeys = statement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                return getUserById(generatedKeys.getLong("id"));
-            } else {
-                throw new RuntimeException("Failed to update user.");
-            }
-        } catch (SQLException e) {
-            logger.error("Check the SQL request.", e);
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", updateUser.getName());
+        params.put("secondName", updateUser.getSecondName());
+        params.put("email", updateUser.getEmail());
+        params.put("password", updateUser.getPassword());
+        params.put("role", updateUser.getRole().toString());
+        params.put("id", updateUser.getId());
+        SqlParameterSource source = new MapSqlParameterSource(params);
+        int rowsUpdate = jdbcTemplate.update(UPDATE, source);
+        if (rowsUpdate != 1) {
+            throw new RuntimeException("Can't update the user" + updateUser);
         }
-        throw new RuntimeException("User not updated.");
+        return getUserById(updateUser.getId());
     }
 
     @Override
     public boolean deleteUserById(Long id) {
         logger.debug("Deleting existing user by ID={}.", id);
-        try {
-            PreparedStatement statement = CONNECTION.prepareStatement(DELETE_BY_ID);
-            statement.setLong(1, id);
-            return statement.executeUpdate() == 1;
-        } catch (SQLException e) {
-            logger.error("Check the SQL request.", e);
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        int rowsUpdate = jdbcTemplate.update(DELETE_BY_ID, params);
+        if (rowsUpdate != 1) {
+            throw new RuntimeException("Can't delete the user with id = " + id);
         }
-        return false;
-    }
-
-    private User userToObj(ResultSet resultSet) throws SQLException {
-        User user = new User();
-        user.setId(resultSet.getLong("id"));
-        user.setName(resultSet.getString("name"));
-        user.setSecondName(resultSet.getString("second_name"));
-        user.setEmail(resultSet.getString("email"));
-        user.setPassword(resultSet.getString("password"));
-        user.setRole(User.UserRole.valueOf(resultSet.getString("role")));
-
-        return user;
+        return rowsUpdate == 1;
     }
 }

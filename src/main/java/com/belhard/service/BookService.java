@@ -20,5 +20,5 @@ public interface BookService {
 
     void deleteBookById(Long id);
 
-    void countAllBooks();
+    int countAllBooks();
 }
