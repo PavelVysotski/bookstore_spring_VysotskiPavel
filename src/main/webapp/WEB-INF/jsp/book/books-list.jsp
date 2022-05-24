@@ -7,12 +7,13 @@
 </head>
 <body>
 	<center>
-		<h1>Book Management</h1>
+		<h1>Books Management</h1>
         <h2>
         	<a href="/books/addBook">Add New Book</a>
-        	&nbsp;&nbsp;&nbsp;
+        	&nbsp;
         	<a href="/books/count">Count of all books</a>
-        	
+            &nbsp;
+            <a href="http://localhost:8081/">Main menu</a>
         </h2>
 	</center>
     <div align="center">
@@ -20,24 +21,22 @@
             <caption><h2>List of Books</h2></caption>
             <tr>
                 <th>ID</th>
-                <th>ISBN</th>
                 <th>Title</th>
                 <th>Author</th>
-                <th>Cover</th>
-                <th>Price</th>
             </tr>
             <c:forEach var="book" items="${books}">
                 <tr>
-                    <td><c:out value="${book.id}" /></td>
-                    <td><c:out value="${book.isbn}" /></td>
-                    <td><c:out value="${book.title}" /></td>
-                    <td><c:out value="${book.author}" /></td>
-                    <td><c:out value="${book.typeCover.toString().toLowerCase()}" /></td>
-                    <td><c:out value="${book.price}" /></td>
+                    <td>${book.id}</td>
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
                     <td>
-                    	<a href="/books/updateBook/<c:out value='${book.id}' />">Update</a>
-                    	&nbsp;&nbsp;&nbsp;&nbsp;
-                    	<a href="/books/delete/<c:out value='${book.id}' />">Delete</a>
+                        <form action="/books/byId/${book.id}" method="get"><input type="submit" value="View"></form>
+                    </td>
+                    <td>
+                        <form action="/books/updateBook/${book.id}" method="get"><input type="submit" value="Update"></form>
+                    </td>
+                    <td>
+                        <form action="/books/delete/${book.id}" method="post"><input type="submit" value="Delete"></form>
                     </td>
                 </tr>
             </c:forEach>

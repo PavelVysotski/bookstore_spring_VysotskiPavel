@@ -73,13 +73,7 @@ public class BookDaoImpl implements BookDao {
     public Book createBook(Book book) {
         logger.debug("Creating new book and adding to database.");
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        Map<String, Object> params = new HashMap<>();
-        params.put("isbn", book.getIsbn());
-        params.put("title", book.getTitle());
-        params.put("author", book.getAuthor());
-        params.put("cover", book.getTypeCover().toString());
-        params.put("price", book.getPrice());
-        SqlParameterSource source = new MapSqlParameterSource(params);
+        SqlParameterSource source = new MapSqlParameterSource(addParams(book));
         int rowsUpdate = jdbcTemplate.update(ADD, source, keyHolder, new String[]{"id"});
         if (rowsUpdate != 1) {
             throw new RuntimeException("Can't create the book" + book);
@@ -93,12 +87,7 @@ public class BookDaoImpl implements BookDao {
     @Override
     public Book updateBook(Book book) {
         logger.debug("Updating existing book in the database.");
-        Map<String, Object> params = new HashMap<>();
-        params.put("isbn", book.getIsbn());
-        params.put("title", book.getTitle());
-        params.put("author", book.getAuthor());
-        params.put("cover", book.getTypeCover().toString());
-        params.put("price", book.getPrice());
+        Map<String, Object> params = addParams(book);
         params.put("id", book.getId());
         SqlParameterSource source = new MapSqlParameterSource(params);
         int rowsUpdate = jdbcTemplate.update(UPDATE, source);
@@ -123,9 +112,19 @@ public class BookDaoImpl implements BookDao {
     @Override
     public int countAllBooks() {
         logger.debug("Getting the total number of books.");
-        return jdbcTemplate.query(COUNT_ALL_BOOKS, (rs) -> {
+        return jdbcTemplate.query(COUNT_ALL_BOOKS, rs -> {
             rs.next();
             return rs.getInt("count");
         });
+    }
+
+    private Map<String, Object> addParams(Book book) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("isbn", book.getIsbn());
+        params.put("title", book.getTitle());
+        params.put("author", book.getAuthor());
+        params.put("cover", book.getTypeCover().toString());
+        params.put("price", book.getPrice());
+        return params;
     }
 }

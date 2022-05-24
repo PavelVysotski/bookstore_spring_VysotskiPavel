@@ -2,8 +2,10 @@ package com.belhard.service.impl;
 
 import com.belhard.dao.book.BookDao;
 import com.belhard.dao.entity.Book;
+import com.belhard.dao.entity.Book.TypeCover;
 import com.belhard.service.BookService;
 import com.belhard.service.dto.book.BookDto;
+import com.belhard.service.dto.book.BookDto.TypeCoverDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -74,7 +76,7 @@ public class BookServiceImpl implements BookService {
         bookDto.setIsbn(book.getIsbn());
         bookDto.setTitle(book.getTitle());
         bookDto.setAuthor(book.getAuthor());
-        bookDto.setTypeCover(BookDto.TypeCoverDto.valueOf(book.getTypeCover().toString()));
+        bookDto.setTypeCover(TypeCoverDto.valueOf(book.getTypeCover().toString()));
         bookDto.setPrice(book.getPrice());
         return bookDto;
     }
@@ -85,7 +87,7 @@ public class BookServiceImpl implements BookService {
         book.setIsbn(bookDto.getIsbn());
         book.setTitle(bookDto.getTitle());
         book.setAuthor(bookDto.getAuthor());
-        book.setTypeCover(Book.TypeCover.valueOf(bookDto.getTypeCover().toString()));
+        book.setTypeCover(TypeCover.valueOf(bookDto.getTypeCover().toString()));
         book.setPrice(bookDto.getPrice());
         return book;
     }

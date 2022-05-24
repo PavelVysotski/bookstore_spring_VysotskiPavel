@@ -7,7 +7,7 @@
 </head>
 
 <body>
-<form method="post" action="createUser">
+<form method="post" action="/users/createUser">
     <b>Form for create new user:</b><br>
     <p><b>Enter new data</b><br>
         <input type="text" name="name"> Name<br>
@@ -20,6 +20,7 @@
         <input type="reset" value="Reset">
     </p>
 </form>
+<p><a href="/users">List users</a></p>
 </body>
 
 </html>

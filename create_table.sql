@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS users(
    second_name VARCHAR (50) NOT NULL,
    email VARCHAR (50) UNIQUE NOT NULL,
    password VARCHAR (50) UNIQUE NOT NULL,
-   role_id BIGINT REFERENCES roles NOT NULL
+   role_id BIGINT REFERENCES roles NOT NULL,
    activity BOOLEAN DEFAULT true NOT NULL
 );
 
@@ -76,3 +76,53 @@ INSERT INTO users (name, second_name, email, password, role_id) VALUES ('Pavel',
 ('Aleksandr', 'Starovoitov', 'AleksStar@mail.ru', '+375-44-009-20-20', 3),
 ('Kirill', 'Semenov', 'semenK@gmail.com', '+375-44-010-21-21', 3),
 ('Victor', 'Nosevich', 'nos@mail.ru', '+375-44-011-22-23', 1);
+
+CREATE TABLE IF NOT EXISTS order_status(
+    id SERIAL PRIMARY KEY,
+    status VARCHAR(50) NOT NULL
+    );
+
+INSERT INTO order_status (status) VALUES ('RESERVED');
+INSERT INTO order_status (status) VALUES ('CONFIRMED');
+INSERT INTO order_status (status) VALUES ('CANCELED');
+
+CREATE TABLE IF NOT EXISTS orders (
+    id SERIAL PRIMARY KEY,
+    user_id BIGINT REFERENCES users (ID) NOT NULL,
+    total_cost DECIMAL NOT NULL,
+    create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP,
+    status_id BIGINT REFERENCES order_status NOT NULL
+    );
+
+INSERT INTO orders (user_id, total_cost, status_id) VALUES (3, 30.22, 1),
+                                                         (7, 21.74, 1),
+                                                        (8, 38.34, 2),
+                                                        (9, 35.22, 2),
+                                                        (11, 34.03, 1),
+                                                        (12, 10.57, 1),
+                                                        (15, 21.56, 3),
+                                                        (17, 23.80, 2);
+
+CREATE TABLE IF NOT EXISTS order_item (
+    id SERIAL PRIMARY KEY,
+    order_id BIGINT REFERENCES orders (ID) NOT NULL,
+    book_id BIGINT REFERENCES books (ID) NOT NULL,
+    quantity BIGINT NOT NULL,
+    price DECIMAL NOT NULL
+    );
+
+INSERT INTO order_item (order_id, book_id, quantity, price) VALUES (1, 2, 2, 7.34),
+                                                         (1, 8, 3, 5.18),
+                                                         (2, 21, 2, 10.87),
+                                                         (3, 9, 1, 14.10),
+                                                         (3, 7, 2, 12.12),
+                                                         (4, 11, 3, 11.74),
+                                                         (5, 3, 1, 8.56),
+                                                         (5, 14, 2, 8.16),
+                                                         (5, 12, 1, 9.15),
+                                                         (6, 18, 1, 10.57),
+                                                         (7, 19, 2, 10.78),
+                                                         (8, 14, 1, 8.16),
+                                                         (8, 15, 1, 8.30),
+                                                         (8, 16, 1, 7.34);

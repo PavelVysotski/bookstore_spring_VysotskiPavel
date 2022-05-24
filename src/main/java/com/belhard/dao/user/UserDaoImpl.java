@@ -58,13 +58,7 @@ public class UserDaoImpl implements UserDao {
     public User createUser(User newUser) {
         logger.debug("Creating new user and adding to database.");
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", newUser.getName());
-        params.put("secondName", newUser.getSecondName());
-        params.put("email", newUser.getEmail());
-        params.put("password", newUser.getPassword());
-        params.put("role", newUser.getRole().toString());
-        SqlParameterSource source = new MapSqlParameterSource(params);
+        SqlParameterSource source = new MapSqlParameterSource(addParams(newUser));
         int rowsUpdate = jdbcTemplate.update(ADD, source, keyHolder, new String[]{"id"});
         if (rowsUpdate != 1) {
             throw new RuntimeException("Can't create the user" + newUser);
@@ -76,21 +70,26 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User updateUser(User updateUser) {
+    public User updateUser(User newUser) {
         logger.debug("Updating existing user.");
+        Map<String, Object> params = addParams(newUser);
+        params.put("id", newUser.getId());
+        SqlParameterSource source = new MapSqlParameterSource(params);
+        int rowsUpdate = jdbcTemplate.update(UPDATE, source);
+        if (rowsUpdate != 1) {
+            throw new RuntimeException("Can't update the user" + newUser);
+        }
+        return getUserById(newUser.getId());
+    }
+
+    private Map<String, Object> addParams(User updateUser) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", updateUser.getName());
         params.put("secondName", updateUser.getSecondName());
         params.put("email", updateUser.getEmail());
         params.put("password", updateUser.getPassword());
         params.put("role", updateUser.getRole().toString());
-        params.put("id", updateUser.getId());
-        SqlParameterSource source = new MapSqlParameterSource(params);
-        int rowsUpdate = jdbcTemplate.update(UPDATE, source);
-        if (rowsUpdate != 1) {
-            throw new RuntimeException("Can't update the user" + updateUser);
-        }
-        return getUserById(updateUser.getId());
+        return params;
     }
 
     @Override
