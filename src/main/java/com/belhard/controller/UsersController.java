@@ -26,56 +26,57 @@ public class UsersController {
     public String getAllUsers(Model model) {
         List<UserDto> users = userService.getAllUsers();
         model.addAttribute("users", users);
-        return "users-list";
+        return "user/users-list";
     }
 
     @GetMapping("/byId/{id}")
     public String getUserById(Model model, @PathVariable Long id) {
         UserDto user = userService.getUserById(id);
         model.addAttribute("user", user);
-        return "user";
+        return "user/user";
     }
 
     @GetMapping("/addUser")
     public String addUserForm() {
-        return "create-user";
+        return "user/create-user";
     }
 
     @PostMapping("/createUser")
-    public String addNewUser(@RequestParam Map<String, Object> params) {
+    public String addNewUser(Model model, @RequestParam Map<String, Object> params) {
         UserDto newUser = new UserDto();
-        newUser.setName(String.valueOf(params.get("name")));
-        newUser.setSecondName(String.valueOf(params.get("secondName")));
-        newUser.setEmail(String.valueOf(params.get("email")));
-        newUser.setPassword(String.valueOf(params.get("password")));
-        newUser.setRole(UserDto.UserRoleDto.valueOf(String.valueOf(params.get("role")).toUpperCase(Locale.ROOT)));
-        userService.createUser(newUser);
-        return "redirect:/users";
+        settingNewData(params, newUser);
+        UserDto user = userService.createUser(newUser);
+        model.addAttribute("user", user);
+        return "user/user";
     }
 
     @GetMapping("/updateUser/{id}")
     public String updateUserForm(Model model, @PathVariable Long id) {
         UserDto user = userService.getUserById(id);
         model.addAttribute("user", user);
-        return "update-user";
+        return "user/update-user";
     }
 
     @PostMapping("/updateUser")
     public String updateUser(@RequestParam Map<String, Object> params) {
         UserDto updateUser = new UserDto();
         updateUser.setId(Long.parseLong(String.valueOf(params.get("id"))));
-        updateUser.setName(String.valueOf(params.get("name")));
-        updateUser.setSecondName(String.valueOf(params.get("secondName")));
-        updateUser.setEmail(String.valueOf(params.get("email")));
-        updateUser.setPassword(String.valueOf(params.get("password")));
-        updateUser.setRole(UserDto.UserRoleDto.valueOf(String.valueOf(params.get("role")).toUpperCase(Locale.ROOT)));
+        settingNewData(params, updateUser);
         userService.updateUser(updateUser);
         return "redirect:/users";
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteUser(@PathVariable Long id) {
         userService.deleteUserById(id);
         return "redirect:/users";
+    }
+
+    private void settingNewData(Map<String, Object> params, UserDto newUser) {
+        newUser.setName(String.valueOf(params.get("name")));
+        newUser.setSecondName(String.valueOf(params.get("secondName")));
+        newUser.setEmail(String.valueOf(params.get("email")));
+        newUser.setPassword(String.valueOf(params.get("password")));
+        newUser.setRole(UserDto.UserRoleDto.valueOf(String.valueOf(params.get("role")).toUpperCase(Locale.ROOT)));
     }
 }

@@ -7,7 +7,7 @@
     </head>
 
     <body>
-        <form method="post" action="createBook">
+        <form method="post" action="/books/createBook">
             <b>Form for create new book:</b><br>
             <p><b>Enter new data</b><br>
                 <input type="text" name="isbn"> ISBN<br>
@@ -20,6 +20,7 @@
                 <input type="reset" value="Reset">
             </p>
         </form>
+        <p><a href="/books">List books</a></p>
     </body>
 
     </html>

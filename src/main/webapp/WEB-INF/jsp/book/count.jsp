@@ -6,5 +6,6 @@
 </head>
 <body>
 <h1>There are total books=${count}</h1>
+<p><a href="/books">List books</a></p>
 </body>
 </html>
