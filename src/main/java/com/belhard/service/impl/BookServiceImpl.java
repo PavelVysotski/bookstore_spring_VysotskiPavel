@@ -64,8 +64,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void countAllBooks() {
-        System.out.println("The number of books on sale is = " + bookDao.countAllBooks());
+    public int countAllBooks() {
+        return bookDao.countAllBooks();
     }
 
     private BookDto bookToBookDto(Book book) {
