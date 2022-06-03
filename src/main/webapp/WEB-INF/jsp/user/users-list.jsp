@@ -7,9 +7,11 @@
 </head>
 <body>
 <center>
-    <h1>Book Management</h1>
+    <h1>Users Management</h1>
     <h2>
         <a href="/users/addUser">Add New User</a>
+        &nbsp;
+        <a href="http://localhost:8081/">Main menu</a>
     </h2>
 </center>
 <div align="center">
@@ -19,20 +21,20 @@
             <th>ID</th>
             <th>Name</th>
             <th>Second Name</th>
-            <th>Email</th>
-            <th>Role</th>
         </tr>
         <c:forEach var="user" items="${users}">
             <tr>
-                <td><c:out value="${user.id}" /></td>
-                <td><c:out value="${user.name}" /></td>
-                <td><c:out value="${user.secondName}" /></td>
-                <td><c:out value="${user.email}" /></td>
-                <td><c:out value="${user.role.toString().toLowerCase()}" /></td>
+                <td>${user.id}</td>
+                <td>${user.name}</td>
+                <td>${user.secondName}</td>
                 <td>
-                    <a href="/users/updateUser/<c:out value='${user.id}' />">Update</a>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <a href="/users/delete/<c:out value='${user.id}' />">Delete</a>
+                    <form action="/users/byId/${user.id}" method="get"><input type="submit" value="View"></form>
+                </td>
+                <td>
+                    <form action="/users/updateUser/${user.id}" method="get"><input type="submit" value="Update"></form>
+                </td>
+                <td>
+                    <form action="/users/delete/${user.id}" method="post"><input type="submit" value="Delete"></form>
                 </td>
             </tr>
         </c:forEach>
