@@ -9,5 +9,6 @@
         <div>${user.name} ${user.secondName}</div>
         <div>Email = ${user.email}</div>
         <div>Role = ${user.role.toString().toLowerCase()}</div>
+        <p><a href="/users">List users</a></p>
     </body>
     </html>

@@ -1,9 +1,11 @@
 package com.belhard.service.impl;
 
 import com.belhard.dao.entity.User;
+import com.belhard.dao.entity.User.UserRole;
 import com.belhard.dao.user.UserDao;
 import com.belhard.service.UserService;
 import com.belhard.service.dto.user.UserDto;
+import com.belhard.service.dto.user.UserDto.UserRoleDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,7 +58,7 @@ public class UserServiceImpl implements UserService {
         userDto.setSecondName(user.getSecondName());
         userDto.setEmail(user.getEmail());
         userDto.setPassword(user.getPassword());
-        userDto.setRole(UserDto.UserRoleDto.valueOf(user.getRole().toString()));
+        userDto.setRole(UserRoleDto.valueOf(user.getRole().toString()));
         return userDto;
     }
 
@@ -67,7 +69,7 @@ public class UserServiceImpl implements UserService {
         user.setSecondName(userDto.getSecondName());
         user.setEmail(userDto.getEmail());
         user.setPassword(userDto.getPassword());
-        user.setRole(User.UserRole.valueOf(userDto.getRole().toString()));
+        user.setRole(UserRole.valueOf(userDto.getRole().toString()));
         return user;
     }
 }

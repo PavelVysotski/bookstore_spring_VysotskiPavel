@@ -27,69 +27,70 @@ public class BooksController {
     public String getAllBooks(Model model) {
         List<BookDto> books = bookService.getAllBooks();
         model.addAttribute("books", books);
-        return "books-list";
+        return "book/books-list";
     }
 
     @GetMapping("/byId/{id}")
     public String getBookById(Model model, @PathVariable Long id) {
         BookDto book = bookService.getBookById(id);
         model.addAttribute("book", book);
-        return "book";
+        return "book/book";
     }
 
     @GetMapping("/byIsbn/{isbn}")
     public String getBookByIsbn(Model model, @PathVariable String isbn) {
         BookDto book = bookService.getBookByIsbn(isbn);
         model.addAttribute("book", book);
-        return "book";
+        return "book/book";
     }
 
     @GetMapping("/addBook")
     public String addBookForm() {
-        return "create-book";
+        return "book/create-book";
     }
 
     @PostMapping("/createBook")
-    public String addNewBook(@RequestParam Map<String, Object> params) {
+    public String addNewBook(Model model, @RequestParam Map<String, Object> params) {
         BookDto newBook = new BookDto();
-        newBook.setIsbn(String.valueOf(params.get("isbn")));
-        newBook.setTitle(String.valueOf(params.get("title")));
-        newBook.setAuthor(String.valueOf(params.get("author")));
-        newBook.setTypeCover(BookDto.TypeCoverDto.valueOf(String.valueOf(params.get("cover")).toUpperCase(Locale.ROOT)));
-        newBook.setPrice(BigDecimal.valueOf(Double.parseDouble(String.valueOf(params.get("price")))));
-        bookService.createBook(newBook);
-        return "redirect:/books";
+        settingNewData(params, newBook);
+        BookDto book = bookService.createBook(newBook);;
+        model.addAttribute("book", book);
+        return "book/book";
     }
 
     @GetMapping("/count")
     public String countBooks(Model model) {
         model.addAttribute("count", bookService.countAllBooks());
-        return "count";
+        return "book/count";
     }
 
     @GetMapping("/updateBook/{id}")
     public String updateBookForm(Model model, @PathVariable Long id) {
         BookDto book = bookService.getBookById(id);
         model.addAttribute("book", book);
-        return "update-book";
+        return "book/update-book";
     }
 
     @PostMapping("/updateBook")
     public String updateBook(@RequestParam Map<String, Object> params) {
         BookDto updateBook = new BookDto();
         updateBook.setId(Long.parseLong(String.valueOf(params.get("id"))));
-        updateBook.setIsbn(String.valueOf(params.get("isbn")));
-        updateBook.setTitle(String.valueOf(params.get("title")));
-        updateBook.setAuthor(String.valueOf(params.get("author")));
-        updateBook.setTypeCover(BookDto.TypeCoverDto.valueOf(String.valueOf(params.get("cover")).toUpperCase(Locale.ROOT)));
-        updateBook.setPrice(BigDecimal.valueOf(Double.parseDouble(String.valueOf(params.get("price")))));
+        settingNewData(params, updateBook);
         bookService.updateBook(updateBook);
         return "redirect:/books";
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteBook(@PathVariable Long id) {
         bookService.deleteBookById(id);
         return "redirect:/books";
+    }
+
+    private void settingNewData(Map<String, Object> params, BookDto newBook) {
+        newBook.setIsbn(String.valueOf(params.get("isbn")));
+        newBook.setTitle(String.valueOf(params.get("title")));
+        newBook.setAuthor(String.valueOf(params.get("author")));
+        newBook.setTypeCover(BookDto.TypeCoverDto.valueOf(String.valueOf(params.get("cover")).toUpperCase(Locale.ROOT)));
+        newBook.setPrice(BigDecimal.valueOf(Double.parseDouble(String.valueOf(params.get("price")))));
     }
 }
