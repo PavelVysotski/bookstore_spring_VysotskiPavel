@@ -86,8 +86,7 @@ public class OrderController {
         }
         List<UserDto> users = userService.getAllUsers();
         int randomIndex = (int) (Math.random() * users.size());
-        Long userId = users.get(randomIndex).getId();
-        newOrder.setUser(userService.getUserById(userId));
+        newOrder.setUser(users.get(randomIndex));
         newOrder.setOrderItems(newItemsDto);
         newOrder.setStatus(OrderDto.OrderStatusDto.RESERVED);
         orderService.createOrder(newOrder);

@@ -47,10 +47,10 @@ INSERT INTO roles (role) VALUES ('CUSTOMER');
 
 CREATE TABLE IF NOT EXISTS users(
    id SERIAL PRIMARY KEY,
-   name VARCHAR (50) NOT NULL,
+   "name" VARCHAR (50) NOT NULL,
    second_name VARCHAR (50) NOT NULL,
    email VARCHAR (50) UNIQUE NOT NULL,
-   password VARCHAR (50) UNIQUE NOT NULL,
+   "password" VARCHAR (50) UNIQUE NOT NULL,
    role_id BIGINT REFERENCES roles NOT NULL,
    activity BOOLEAN DEFAULT true NOT NULL
 );
