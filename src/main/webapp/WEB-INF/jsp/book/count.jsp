@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Count of all books</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
 <h1>There are total books=${count}</h1>

@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -14,8 +15,8 @@ public class OrderDto {
     private UserDto user;
     private OrderStatusDto status;
     private BigDecimal totalCost;
-    private LocalDateTime createTime;
-    private LocalDateTime updateTime;
+    private Date createTime;
+    private Date updateTime;
     private List<OrderItemDto> orderItems;
 
     public enum OrderStatusDto {

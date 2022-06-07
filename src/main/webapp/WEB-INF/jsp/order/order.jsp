@@ -3,7 +3,7 @@
 <html>
 <head>
     <title>Order</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
 <h1>Order, id=${order.id}</h1>

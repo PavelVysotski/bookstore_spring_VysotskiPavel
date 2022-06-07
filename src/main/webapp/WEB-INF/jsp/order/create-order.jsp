@@ -3,7 +3,7 @@
 <html>
 <head>
     <title>Order</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
 <form method="post" action="/orders/createOrder">
@@ -20,7 +20,7 @@
             </tr>
             <c:forEach var="book" items="${books}">
                 <tr>
-                    <input type="hidden" name="bookId" value=${book.id}>
+                    <input type="hidden" name="bookId" value="${book.id}">
                     <td>${book.title}</td>
                     <td>${book.author}</td>
                     <td><input data-quantity type="number" step="1" min="0" name="quantity" value="0"></td>
