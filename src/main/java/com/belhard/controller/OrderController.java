@@ -12,11 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/orders")
@@ -144,7 +140,7 @@ public class OrderController {
         updateOrder.setId(orderId);
         updateOrder.setUser(orderService.getOrderById(orderId).getUser());
         updateOrder.setCreateTime(orderService.getOrderById(orderId).getCreateTime());
-        updateOrder.setUpdateTime(LocalDateTime.now());
+        updateOrder.setUpdateTime(new Date());
         updateOrder.setStatus(orderService.getOrderById(orderId).getStatus());
         updateOrder.setOrderItems(newItemsDto);
         orderService.updateOrder(updateOrder);

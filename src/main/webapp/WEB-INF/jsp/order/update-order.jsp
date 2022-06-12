@@ -3,7 +3,7 @@
 <html>
 <head>
     <title>Order</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
 <form method="post" action="/orders/updateOrder">
@@ -20,11 +20,11 @@
             </tr>
             <c:forEach var="itemsForUpdate" items="${itemsForUpdate}">
                 <tr>
-                    <input type="hidden" name="id" value=${order.id}>
-                    <input type="hidden" name="bookId" value=${itemsForUpdate.book.id}>
+                    <input type="hidden" name="id" value="${order.id}">
+                    <input type="hidden" name="bookId" value="${itemsForUpdate.book.id}">
                     <td>${itemsForUpdate.book.title}</td>
                     <td>${itemsForUpdate.book.author}</td>
-                    <td><input data-quantity type="number" step="1" min="0" name="quantity" value=${itemsForUpdate.quantity}></td>
+                    <td><input data-quantity type="number" step="1" min="0" name="quantity" value="${itemsForUpdate.quantity}"></td>
                     <td data-price>${itemsForUpdate.price}</td>
                 </tr>
             </c:forEach>

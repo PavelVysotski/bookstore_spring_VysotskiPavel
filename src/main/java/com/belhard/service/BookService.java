@@ -10,13 +10,9 @@ public interface BookService {
 
     BookDto getBookById(Long id);
 
-    BookDto getBookByIsbn(String isbn);
-
     BookDto createBook(BookDto bookDto);
 
     BookDto updateBook(BookDto bookDto);
-
-    List<BookDto> getBooksByAuthor(String author);
 
     void deleteBookById(Long id);
 

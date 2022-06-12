@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Spring Boot Application</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
 <h1>Spring Boot Application</h1>

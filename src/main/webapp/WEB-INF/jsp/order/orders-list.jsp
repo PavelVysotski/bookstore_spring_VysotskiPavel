@@ -1,9 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
 <html>
 <head>
   <title>Order Management Application</title>
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
 <center>
@@ -35,9 +37,11 @@
         <td>
           <form action="/orders/updateOrder/${order.id}" method="get"><input type="submit" value="Update"></form>
         </td>
-        <td>
-          <form action="/orders/delete/${order.id}" method="post"><input type="submit" value="Delete"></form>
-        </td>
+        <security:authorize access="hasAnyRole('ADMIN', 'MANAGER')">
+          <td>
+            <form action="/orders/delete/${order.id}" method="post"><input type="submit" value="Delete"></form>
+          </td>
+        </security:authorize>
       </tr>
     </c:forEach>
   </table>

@@ -37,13 +37,6 @@ public class BooksController {
         return "book/book";
     }
 
-    @GetMapping("/byIsbn/{isbn}")
-    public String getBookByIsbn(Model model, @PathVariable String isbn) {
-        BookDto book = bookService.getBookByIsbn(isbn);
-        model.addAttribute("book", book);
-        return "book/book";
-    }
-
     @GetMapping("/addBook")
     public String addBookForm() {
         return "book/create-book";

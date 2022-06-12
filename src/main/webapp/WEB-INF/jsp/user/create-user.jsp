@@ -3,7 +3,7 @@
 
 <head>
     <title>User</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body>
@@ -14,7 +14,10 @@
         <input type="text" name="secondName"> Second Name<br>
         <input type="text" name="email"> Email<br>
         <input type="password" name="password"> Password<br>
-        <input type="text" name="role"> Role<br>
+    <p><b>Choose role</b><br>
+        <input type="radio" value="ADMIN" name="role"> ADMIN<br>
+        <input type="radio" value="MANAGER" name="role"> MANAGER<br>
+        <input type="radio" value="CUSTOMER" name="role" checked> CUSTOMER<br>
     </p>
     <p><input type="submit" value="Submit">
         <input type="reset" value="Reset">

@@ -1,8 +1,8 @@
 package com.belhard.service.impl;
 
-import com.belhard.dao.book.BookDao;
-import com.belhard.dao.entity.Book;
-import com.belhard.dao.entity.Book.TypeCover;
+import com.belhard.repository.book.BookRepository;
+import com.belhard.repository.entity.Book;
+import com.belhard.repository.entity.Book.TypeCover;
 import com.belhard.service.BookService;
 import com.belhard.service.dto.book.BookDto;
 import com.belhard.service.dto.book.BookDto.TypeCoverDto;
@@ -10,64 +10,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class BookServiceImpl implements BookService {
 
-    public final BookDao bookDao;
+    private final BookRepository bookRepository;
 
     @Autowired
-    public BookServiceImpl(BookDao bookDao) {
-        this.bookDao = bookDao;
+    public BookServiceImpl(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
     }
 
     @Override
     public BookDto createBook(BookDto bookDto) {
-        return bookToBookDto(bookDao.createBook(bookDtoToBook(bookDto)));
+        return bookToBookDto(bookRepository.save(bookDtoToBook(bookDto)));
     }
 
     @Override
     public BookDto updateBook(BookDto bookDto) {
-        return bookToBookDto(bookDao.updateBook(bookDtoToBook(bookDto)));
+        return bookToBookDto(bookRepository.save(bookDtoToBook(bookDto)));
     }
 
     @Override
     public List<BookDto> getAllBooks() {
-        return bookDao.getAllBooks().stream()
+        return bookRepository.findAllBooks().stream()
                 .map(this::bookToBookDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public BookDto getBookById(Long id) {
-        return bookToBookDto(bookDao.getBookById(id));
-    }
-
-    @Override
-    public BookDto getBookByIsbn(String isbn) {
-        return bookToBookDto(bookDao.getBookByIsbn(isbn));
-    }
-
-    @Override
-    public List<BookDto> getBooksByAuthor(String author) {
-        return bookDao.getBooksByAuthor(author).stream()
-                .map(this::bookToBookDto)
-                .collect(Collectors.toList());
+        Optional<Book> bookOptional = bookRepository.findById(id);
+        Book book = bookOptional.orElseThrow(() -> new RuntimeException("No book with id = " + id));
+        return bookToBookDto(book);
     }
 
     @Override
     public void deleteBookById(Long id) {
-        if (bookDao.deleteBookById(id)) {
-            System.out.println("The book has been successfully removed from sale.");
-        } else {
-            System.out.println("This book has been removed or does not exist in the list.");
-        }
+        bookRepository.deleteById(id);
     }
 
     @Override
     public int countAllBooks() {
-        return bookDao.countAllBooks();
+        return bookRepository.countAllBooks();
     }
 
     private BookDto bookToBookDto(Book book) {

@@ -1,54 +1,68 @@
 package com.belhard.service.impl;
 
-import com.belhard.dao.entity.User;
-import com.belhard.dao.entity.User.UserRole;
-import com.belhard.dao.user.UserDao;
+import com.belhard.repository.entity.Order;
+import com.belhard.repository.entity.User;
+import com.belhard.repository.entity.User.UserRole;
+import com.belhard.repository.order.OrderRepository;
+import com.belhard.repository.user.UserRepository;
+import com.belhard.service.OrderService;
 import com.belhard.service.UserService;
 import com.belhard.service.dto.user.UserDto;
 import com.belhard.service.dto.user.UserDto.UserRoleDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserDao userDao;
+    private final UserRepository userRepository;
+    private final OrderService orderService;
+    private final OrderRepository orderRepository;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao) {
-        this.userDao = userDao;
+    public UserServiceImpl(UserRepository userRepository, @Lazy OrderService orderService, OrderRepository orderRepository) {
+        this.userRepository = userRepository;
+        this.orderService = orderService;
+        this.orderRepository = orderRepository;
     }
 
     @Override
     public List<UserDto> getAllUsers() {
-        return userDao.getAllUsers().stream()
+        return userRepository.findAllUsers().stream()
                 .map(this::userToUserDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public UserDto getUserById(Long id) {
-        return userToUserDto(userDao.getUserById(id));
+        Optional<User> userOptional = userRepository.findById(id);
+        User user = userOptional.orElseThrow(() -> new RuntimeException("No user with id = " + id));
+        return userToUserDto(user);
     }
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        return userToUserDto(userDao.createUser(userDtoToUser(userDto)));
+        return userToUserDto(userRepository.save(userDtoToUser(userDto)));
     }
 
     @Override
     public UserDto updateUser(UserDto userDto) {
-        return userToUserDto(userDao.updateUser(userDtoToUser(userDto)));
+        return userToUserDto(userRepository.save(userDtoToUser(userDto)));
     }
 
     @Override
     public void deleteUserById(Long id) {
-        if (!userDao.deleteUserById(id)) {
-            throw new RuntimeException("This user has been inactive or does not exist in the list.");
-        }
+        List<Order> orders = orderRepository.findAllOrders();
+        orders.forEach(order -> {
+            if (order.getUserId().equals(id)) {
+                orderService.deleteOrderById(order.getId());
+            }
+        });
+        userRepository.deleteById(id);
     }
 
     private UserDto userToUserDto(User user) {
