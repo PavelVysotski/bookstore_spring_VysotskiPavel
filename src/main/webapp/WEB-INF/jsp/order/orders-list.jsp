@@ -11,7 +11,7 @@
 <center>
   <h1>Orders Management</h1>
   <h2>
-    <a href="/orders/addOrder">Add New Order</a>
+    <a href="/api/orders/create">Add New Order</a>
     &nbsp;
     <a href="http://localhost:8081/">Main menu</a>
   </h2>
@@ -32,14 +32,14 @@
         <td>${order.totalCost}</td>
         <td>${order.status}</td>
         <td>
-          <form action="/orders/byId/${order.id}" method="get"><input type="submit" value="View"></form>
+          <form action="/api/orders/${order.id}" method="get"><input type="submit" value="View"></form>
         </td>
         <td>
-          <form action="/orders/updateOrder/${order.id}" method="get"><input type="submit" value="Update"></form>
+          <form action="/api/orders/update/${order.id}" method="get"><input type="submit" value="Update"></form>
         </td>
         <security:authorize access="hasAnyRole('ADMIN', 'MANAGER')">
           <td>
-            <form action="/orders/delete/${order.id}" method="post"><input type="submit" value="Delete"></form>
+            <form action="/api/orders/delete/${order.id}" method="post"><input type="submit" value="Delete"></form>
           </td>
         </security:authorize>
       </tr>

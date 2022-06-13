@@ -11,9 +11,9 @@
 <center>
     <h1>Books Management</h1>
     <h2>
-        <a href="/books/addBook">Add New Book</a>
+        <a href="/api/books/create">Add New Book</a>
         &nbsp;
-        <a href="/books/count">Count of all books</a>
+        <a href="/api/books/count">Count of all books</a>
         &nbsp;
         <a href="http://localhost:8081/">Main menu</a>
     </h2>
@@ -32,16 +32,16 @@
                 <td>${book.title}</td>
                 <td>${book.author}</td>
                 <td>
-                    <form action="/books/byId/${book.id}" method="get"><input type="submit" value="View"></form>
+                    <form action="/api/books/${book.id}" method="get"><input type="submit" value="View"></form>
                 </td>
                 <security:authorize access="hasAnyRole('ADMIN', 'MANAGER')">
                     <td>
-                        <form action="/books/updateBook/${book.id}" method="get"><input type="submit" value="Update"></form>
+                        <form action="/api/books/update/${book.id}" method="get"><input type="submit" value="Update"></form>
                     </td>
                 </security:authorize>
                 <security:authorize access="hasRole('ADMIN')">
                     <td>
-                        <form action="/books/delete/${book.id}" method="post"><input type="submit" value="Delete">
+                        <form action="/api/books/delete/${book.id}" method="post"><input type="submit" value="Delete">
                         </form>
                     </td>
                 </security:authorize>

@@ -7,62 +7,56 @@ import com.belhard.service.dto.book.BookDto;
 import com.belhard.service.dto.order.OrderDto;
 import com.belhard.service.dto.order.OrderItemDto;
 import com.belhard.service.dto.user.UserDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import lombok.AllArgsConstructor;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.*;
 
-@Controller
-@RequestMapping("/orders")
+@RestController
+@RequestMapping("/api/orders")
+@AllArgsConstructor
 public class OrderController {
 
     private final OrderService orderService;
     private final BookService bookService;
     private final UserService userService;
 
-    @Autowired
-    public OrderController(OrderService orderService, BookService bookService, UserService userService) {
-        this.orderService = orderService;
-        this.bookService = bookService;
-        this.userService = userService;
-    }
-
-    @GetMapping("/byId/{id}")
-    public String getOrderById(Model model, @PathVariable Long id) {
+    @GetMapping("/{id}")
+    public ModelAndView getOrderById(Model model, @PathVariable Long id) {
         OrderDto order = orderService.getOrderById(id);
         UserDto user = order.getUser();
         List<OrderItemDto> orderItems = order.getOrderItems();
         model.addAttribute("orderItems", orderItems);
         model.addAttribute("user", user);
         model.addAttribute("order", order);
-        return "order/order";
+        return new ModelAndView("order/order");
     }
 
     @GetMapping
-    public String getAllOrders(Model model) {
+    public ModelAndView getAllOrders(Model model) {
         List<OrderDto> orders = orderService.getAllOrders();
         model.addAttribute("orders", orders);
-        return "order/orders-list";
+        return new ModelAndView("order/orders-list");
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteOrder(@PathVariable Long id) {
+    public ModelAndView deleteOrder(@PathVariable Long id) {
         orderService.deleteOrderById(id);
-        return "redirect:/orders";
+        return new ModelAndView("redirect:/api/orders");
     }
 
-    @GetMapping("/addOrder")
-    public String addOrderForm(Model model) {
+    @GetMapping("/create")
+    public ModelAndView addOrderForm(Model model) {
         List<BookDto> books = bookService.getAllBooks();
         model.addAttribute("books", books);
-        return "order/create-order";
+        return new ModelAndView("order/create-order");
     }
 
     @PostMapping("/createOrder")
-    public String addNewOrder(@RequestParam(name = "bookId") List<Long> allBookId,
-                              @RequestParam(name = "quantity") List<Integer> allBookQuantity) {
+    public ModelAndView addNewOrder(@RequestParam(name = "bookId") List<Long> allBookId,
+                                    @RequestParam(name = "quantity") List<Integer> allBookQuantity) {
         Map<Long, Integer> params = new HashMap<>();
         for (int i = 0; i < allBookId.size(); i++) {
             if (allBookQuantity.get(i) == 0) {
@@ -87,11 +81,11 @@ public class OrderController {
         newOrder.setOrderItems(newItemsDto);
         newOrder.setStatus(OrderDto.OrderStatusDto.RESERVED);
         orderService.createOrder(newOrder);
-        return "redirect:/orders";
+        return new ModelAndView("redirect:/api/orders");
     }
 
-    @GetMapping("/updateOrder/{id}")
-    public String updateUserForm(Model model, @PathVariable Long id) {
+    @GetMapping("/update/{id}")
+    public ModelAndView updateUserForm(Model model, @PathVariable Long id) {
         OrderDto order = orderService.getOrderById(id);
         List<BookDto> books = bookService.getAllBooks();
         List<OrderItemDto> orderItems = order.getOrderItems();
@@ -113,13 +107,13 @@ public class OrderController {
         model.addAttribute("books", books);
         model.addAttribute("itemsForUpdate", itemsForUpdate);
         model.addAttribute("order", order);
-        return "order/update-order";
+        return new ModelAndView("order/update-order");
     }
 
     @PostMapping("/updateOrder")
-    public String updateUser(@RequestParam(name = "bookId") List<Long> allBookId,
-                             @RequestParam(name = "quantity") List<Integer> allBookQuantity,
-                             @RequestParam(name = "id") Long orderId) {
+    public ModelAndView updateUser(@RequestParam(name = "bookId") List<Long> allBookId,
+                                   @RequestParam(name = "quantity") List<Integer> allBookQuantity,
+                                   @RequestParam(name = "id") Long orderId) {
         Map<Long, Integer> params = new HashMap<>();
         for (int i = 0; i < allBookId.size(); i++) {
             if (allBookQuantity.get(i) == 0) {
@@ -144,6 +138,6 @@ public class OrderController {
         updateOrder.setStatus(orderService.getOrderById(orderId).getStatus());
         updateOrder.setOrderItems(newItemsDto);
         orderService.updateOrder(updateOrder);
-        return "redirect:/orders";
+        return new ModelAndView("redirect:/api/orders");
     }
 }

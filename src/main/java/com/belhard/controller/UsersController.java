@@ -2,74 +2,70 @@ package com.belhard.controller;
 
 import com.belhard.service.UserService;
 import com.belhard.service.dto.user.UserDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import lombok.AllArgsConstructor;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-@Controller
-@RequestMapping("/users")
+@RestController
+@RequestMapping("/api/users")
+@AllArgsConstructor
 public class UsersController {
 
     private final UserService userService;
 
-    @Autowired
-    public UsersController(UserService userService) {
-        this.userService = userService;
-    }
-
     @GetMapping
-    public String getAllUsers(Model model) {
+    public ModelAndView getAllUsers(Model model) {
         List<UserDto> users = userService.getAllUsers();
         model.addAttribute("users", users);
-        return "user/users-list";
+        return new ModelAndView("user/users-list");
     }
 
-    @GetMapping("/byId/{id}")
-    public String getUserById(Model model, @PathVariable Long id) {
+    @GetMapping("/{id}")
+    public ModelAndView getUserById(Model model, @PathVariable Long id) {
         UserDto user = userService.getUserById(id);
         model.addAttribute("user", user);
-        return "user/user";
+        return new ModelAndView("user/user");
     }
 
-    @GetMapping("/addUser")
-    public String addUserForm() {
-        return "user/create-user";
+    @GetMapping("/create")
+    public ModelAndView addUserForm() {
+        return new ModelAndView("user/create-user");
     }
 
     @PostMapping("/createUser")
-    public String addNewUser(Model model, @RequestParam Map<String, Object> params) {
+    public ModelAndView addNewUser(Model model, @RequestParam Map<String, Object> params) {
         UserDto newUser = new UserDto();
         settingNewData(params, newUser);
         UserDto user = userService.createUser(newUser);
         model.addAttribute("user", user);
-        return "user/user";
+        return new ModelAndView("user/user");
     }
 
-    @GetMapping("/updateUser/{id}")
-    public String updateUserForm(Model model, @PathVariable Long id) {
+    @GetMapping("/update/{id}")
+    public ModelAndView updateUserForm(Model model, @PathVariable Long id) {
         UserDto user = userService.getUserById(id);
         model.addAttribute("user", user);
-        return "user/update-user";
+        return new ModelAndView("user/update-user");
     }
 
     @PostMapping("/updateUser")
-    public String updateUser(@RequestParam Map<String, Object> params) {
+    public ModelAndView updateUser(@RequestParam Map<String, Object> params) {
         UserDto updateUser = new UserDto();
         updateUser.setId(Long.parseLong(String.valueOf(params.get("id"))));
         settingNewData(params, updateUser);
         userService.updateUser(updateUser);
-        return "redirect:/users";
+        return new ModelAndView("redirect:/api/users");
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteUser(@PathVariable Long id) {
+    public ModelAndView deleteUser(@PathVariable Long id) {
         userService.deleteUserById(id);
-        return "redirect:/users";
+        return new ModelAndView("redirect:/api/users");
     }
 
     private void settingNewData(Map<String, Object> params, UserDto newUser) {

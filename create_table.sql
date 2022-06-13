@@ -40,12 +40,12 @@ CREATE TABLE IF NOT EXISTS users(
    "name" VARCHAR (50) NOT NULL,
    second_name VARCHAR (50) NOT NULL,
    email VARCHAR (50) UNIQUE NOT NULL,
-   "password" VARCHAR (50) UNIQUE NOT NULL,
+   "password" VARCHAR (100) UNIQUE NOT NULL,
    "role" VARCHAR(25) NOT NULL,
    activity BOOLEAN DEFAULT true NOT NULL
 );
 
-INSERT INTO users (name, second_name, email, password, role_id) VALUES ('Pavel', 'Vysotski', 'pavel@gmail.com', '+375-29-111-22-33', 'ADMIN'),
+INSERT INTO users (name, second_name, email, password, role) VALUES ('Pavel', 'Vysotski', 'pavel@gmail.com', '+375-29-111-22-33', 'ADMIN'),
 ('Igor', 'Ignatiev', 'igorIgnatiev@gamail.com', '+375-29-222-33-44', 'MANAGER'),
 ('Oleg', 'Pavlov', 'olegPavlov@gmail.com', '+375-29-333-44-55', 'CUSTOMER'),
 ('Aleksandr', 'Minskiy', 'aleksandr@gmail.com', '+375-29-444-55-66', 'MANAGER'),
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS orders (
     status VARCHAR(25) NOT NULL
     );
 
-INSERT INTO orders (user_id, total_cost, status_id) VALUES (3, 30.22, 'RESERVED'),
+INSERT INTO orders (user_id, total_cost, status) VALUES (3, 30.22, 'RESERVED'),
                                                          (7, 21.74, 'RESERVED'),
                                                         (8, 38.34, 'CONFIRMED'),
                                                         (9, 35.22, 'CONFIRMED'),

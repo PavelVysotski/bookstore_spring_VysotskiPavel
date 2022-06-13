@@ -7,13 +7,13 @@
 </head>
 
 <body>
-<form method="post" action="/books/createBook">
+<form method="post" action="/api/books/createBook">
     <b>Form for create new book:</b><br>
     <p><b>Enter new data</b><br>
         <input type="text" name="isbn"> ISBN<br>
         <input type="text" name="title"> Title<br>
         <input type="text" name="author"> Author<br>
-    <p><b>Choose type of cover</b><br>
+    <b>Choose type of cover</b><br>
         <input type="radio" value="HARD" name="cover" checked> HARD<br>
         <input type="radio" value="SOFT" name="cover"> SOFT<br>
         <input type="number" step="0.01" name="price"> Price<br>
@@ -22,7 +22,7 @@
         <input type="reset" value="Reset">
     </p>
 </form>
-<p><a href="/books">List books</a></p>
+<p><a href="/api/books">List books</a></p>
 </body>
 
 </html>
