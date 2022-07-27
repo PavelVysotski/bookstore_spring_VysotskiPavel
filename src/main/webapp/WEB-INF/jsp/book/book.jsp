@@ -9,6 +9,6 @@
 <div>${book.title} by ${book.author} in ${book.typeCover.toString().toLowerCase()} cover</div>
 <div>ISBN = ${book.isbn}</div>
 <div>Price = ${book.price}</div>
-<p><a href="/books">List books</a></p>
+<p><a href="/api/books">List books</a></p>
 </body>
 </html>

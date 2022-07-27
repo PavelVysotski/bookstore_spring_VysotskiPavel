@@ -11,6 +11,7 @@ import com.belhard.service.dto.order.OrderDto;
 import com.belhard.service.dto.order.OrderDto.OrderStatusDto;
 import com.belhard.service.dto.order.OrderItemDto;
 import com.belhard.service.dto.user.UserDto;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class OrderServiceImpl implements OrderService {
 
     private final UserService userService;
@@ -26,13 +28,6 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-
-    public OrderServiceImpl(UserService userService, BookService bookService, OrderRepository orderRepository, OrderItemRepository orderItemRepository) {
-        this.userService = userService;
-        this.bookService = bookService;
-        this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
-    }
 
     @Override
     public List<OrderDto> getAllOrders() {

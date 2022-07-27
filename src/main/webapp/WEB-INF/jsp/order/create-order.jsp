@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-<form method="post" action="/orders/createOrder">
+<form method="post" action="/api/orders/createOrder">
     <b>Form for create order:</b><br>
     <p><b>Enter data:</b><br>
     <div>
@@ -36,7 +36,7 @@
 </form>
 
 <div data-total>Total Cost = 0</div>
-<p><a href="/orders">List orders</a></p>
+<p><a href="/api/orders">List orders</a></p>
 <script>
     const prices = [...document.querySelectorAll('td[data-price]')].map(item => item.innerHTML);
     const totalNode = document.querySelector('div[data-total]');

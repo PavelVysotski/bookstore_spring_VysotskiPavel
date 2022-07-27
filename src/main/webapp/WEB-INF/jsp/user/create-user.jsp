@@ -7,14 +7,14 @@
 </head>
 
 <body>
-<form method="post" action="/users/createUser">
+<form method="post" action="/api/users/createUser">
     <b>Form for create new user:</b><br>
     <p><b>Enter new data</b><br>
         <input type="text" name="name"> Name<br>
         <input type="text" name="secondName"> Second Name<br>
         <input type="text" name="email"> Email<br>
         <input type="password" name="password"> Password<br>
-    <p><b>Choose role</b><br>
+    <b>Choose role</b><br>
         <input type="radio" value="ADMIN" name="role"> ADMIN<br>
         <input type="radio" value="MANAGER" name="role"> MANAGER<br>
         <input type="radio" value="CUSTOMER" name="role" checked> CUSTOMER<br>
@@ -23,7 +23,7 @@
         <input type="reset" value="Reset">
     </p>
 </form>
-<p><a href="/users">List users</a></p>
+<p><a href="/api/users">List users</a></p>
 </body>
 
 </html>

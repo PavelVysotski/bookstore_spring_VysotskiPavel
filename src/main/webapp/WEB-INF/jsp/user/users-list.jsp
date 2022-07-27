@@ -11,7 +11,7 @@
 <center>
     <h1>Users Management</h1>
     <h2>
-        <a href="/users/addUser">Add New User</a>
+        <a href="/api/users/create">Add New User</a>
         &nbsp;
         <a href="http://localhost:8081/">Main menu</a>
     </h2>
@@ -30,14 +30,14 @@
                 <td>${user.name}</td>
                 <td>${user.secondName}</td>
                 <td>
-                    <form action="/users/byId/${user.id}" method="get"><input type="submit" value="View"></form>
+                    <form action="/api/users/${user.id}" method="get"><input type="submit" value="View"></form>
                 </td>
                 <td>
-                    <form action="/users/updateUser/${user.id}" method="get"><input type="submit" value="Update"></form>
+                    <form action="/api/users/update/${user.id}" method="get"><input type="submit" value="Update"></form>
                 </td>
                 <security:authorize access="hasRole('ADMIN')">
                     <td>
-                        <form action="/users/delete/${user.id}" method="post"><input type="submit" value="Delete"></form>
+                        <form action="/api/users/delete/${user.id}" method="post"><input type="submit" value="Delete"></form>
                     </td>
                 </security:authorize>
             </tr>

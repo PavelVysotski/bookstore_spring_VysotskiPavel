@@ -6,21 +6,17 @@ import com.belhard.repository.entity.Book.TypeCover;
 import com.belhard.service.BookService;
 import com.belhard.service.dto.book.BookDto;
 import com.belhard.service.dto.book.BookDto.TypeCoverDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
-
-    @Autowired
-    public BookServiceImpl(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
 
     @Override
     public BookDto createBook(BookDto bookDto) {

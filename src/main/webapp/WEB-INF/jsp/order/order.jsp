@@ -29,6 +29,6 @@
 </div>
 <div>Total Cost = ${order.totalCost}</div>
 <div>Status = ${order.status.toString().toLowerCase()}</div>
-<p><a href="/orders">List orders</a></p>
+<p><a href="/api/orders">List orders</a></p>
 </body>
 </html>
